@@ -1,0 +1,12 @@
+.git
+.github
+.gitattributes
+.gitignore
+tests
+web
+models
+output
+input
+custom_nodes
+__pycache__
+*.pyc
