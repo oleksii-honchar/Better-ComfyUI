@@ -33,7 +33,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Python runtime via conda (matches the known-good 3.11.x runtime from the previous image)
+# Node.js 22 (LTS) — runtime dependency for ComfyUI-Manager (matches the live image).
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python runtime via conda (3.14 — confirmed against the live image's
+# /opt/conda/lib/python3.14; the older checked-in comment's runtime claim was wrong)
 RUN wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O /tmp/mf.sh \
     && /bin/bash /tmp/mf.sh -b -p /opt/conda \
     && rm /tmp/mf.sh
@@ -54,6 +60,27 @@ RUN /opt/conda/bin/pip install --no-cache-dir -r /tmp/requirements.txt
 # ComfyUI source (this fork)
 WORKDIR /opt/comfyui
 COPY . /opt/comfyui
+
+# ComfyUI-Manager requirements (matches the live image layer; file is COPYed above)
+RUN /opt/conda/bin/pip install --no-cache-dir -r /opt/comfyui/manager_requirements.txt
+
+# Own the conda env and the ComfyUI tree (container runs as user 1000:1000; matches
+# the live image layer)
+RUN chown -R 1000:1000 /opt/conda /opt/comfyui
+
+# MCP stack pins (baked into the image; comfy-mcp is the stdio MCP server,
+# mcp-sse-wrapper.py exposes it over SSE on :8189). Pins verified against the live
+# image (comfy-cli 1.20.0, comfy-mcp 0.10.0) and ADR-002. The mcp-SDK-based wrapper
+# replaces mcp-proxy (which requires mcp<2 and is incompatible with comfy-mcp's
+# mcp 2.x dependency).
+RUN /opt/conda/bin/pip install --no-cache-dir \
+        comfy-mcp==0.10.0 comfy-cli>=1.14.0
+
+# MCP SSE wrapper (mcp-SDK-based replacement for mcp-proxy; managed child of
+# docker-entrypoint.sh; no nohup supervisor)
+COPY mcp-sse-wrapper.py /app/mcp-sse-wrapper.py
+COPY mcp-sse-launcher.sh /mcp-sse-launcher.sh
+RUN chmod +x /mcp-sse-launcher.sh
 
 # Entrypoint: model directories + custom-node requirements + CLI_ARGS support
 COPY docker-entrypoint.sh /docker-entrypoint.sh
