@@ -21,6 +21,15 @@ for req in /opt/comfyui/custom_nodes/*/requirements.txt; do
         || echo "  WARN: failed to install requirements for $node"
 done
 
+# Start MCP SSE wrapper as a background managed child (baked into image; no host script needed).
+# NOTE: MUST be backgrounded — the launcher runs the mcp-SDK SSE server (long-running);
+# a foreground invocation would block the entrypoint and ComfyUI would never start.
+if [ -x /mcp-sse-launcher.sh ]; then
+    echo "[INFO] Starting MCP SSE wrapper (background)..."
+    COMFY_LOCAL_URL=http://127.0.0.1:8188 /mcp-sse-launcher.sh \
+        > /tmp/mcp-sse.log 2>&1 &
+fi
+
 cd /opt/comfyui
 exec /opt/conda/bin/python main.py \
     --port 8188 \
