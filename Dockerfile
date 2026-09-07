@@ -77,8 +77,9 @@ RUN /opt/conda/bin/pip install --no-cache-dir \
         comfy-mcp==0.10.0 comfy-cli>=1.14.0
 
 # MCP SSE wrapper (mcp-SDK-based replacement for mcp-proxy; managed child of
-# docker-entrypoint.sh; no nohup supervisor)
-COPY mcp-sse-wrapper.py /app/mcp-sse-wrapper.py
+# docker-entrypoint.sh; no nohup supervisor).
+# NOTE: lives in /opt/comfyui (repo tree) NOT /app — compose bind-mounts ./data:/app
+# which would shadow a baked /app script.
 COPY mcp-sse-launcher.sh /mcp-sse-launcher.sh
 RUN chmod +x /mcp-sse-launcher.sh
 
