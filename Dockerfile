@@ -65,6 +65,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && CMAKE_ARGS="-DLLAMA_CUDA=on -DLLAMA_CUBLAS=on" /opt/conda/bin/pip install --no-cache-dir llama-cpp-python
 
+# llama-cpp-python with CUDA support (required by ComfyUI-QwenVL node)
+# Python 3.14 has no pre-built CUDA wheel, so we compile from source
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        cmake \
+        libcurl4-openssl-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && CMAKE_ARGS="-DLLAMA_CUDA=on -DLLAMA_CUBLAS=on" /opt/conda/bin/pip install --no-cache-dir llama-cpp-python
+
 # ComfyUI source (this fork)
 WORKDIR /opt/comfyui
 COPY . /opt/comfyui
