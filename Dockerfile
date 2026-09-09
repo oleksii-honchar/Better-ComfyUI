@@ -63,7 +63,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         cmake \
         libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && CMAKE_ARGS="-DGGML_CUDA=on -DGGML_CUBLAS=on" /opt/conda/bin/pip install --no-cache-dir llama-cpp-python
+    && CMAKE_ARGS="-DGGML_CUDA=on" /opt/conda/bin/pip install --no-cache-dir llama-cpp-python
 
 # ComfyUI source (this fork)
 WORKDIR /opt/comfyui
