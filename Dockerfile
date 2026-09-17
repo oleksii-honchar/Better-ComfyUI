@@ -72,6 +72,14 @@ COPY . /opt/comfyui
 # ComfyUI-Manager requirements (matches the live image layer; file is COPYed above)
 RUN /opt/conda/bin/pip install --no-cache-dir -r /opt/comfyui/manager_requirements.txt
 
+# Custom node requirements — installed at build time to avoid runtime pip installs.
+# This file is maintained separately (not git-managed) and regenerated when new
+# custom nodes are added. The entrypoint script still runs for nodes added after
+# the image was built (incremental install).
+COPY custom_node_requirements.txt /tmp/custom_node_requirements.txt
+RUN /opt/conda/bin/pip install --no-cache-dir -r /tmp/custom_node_requirements.txt && \
+    rm -f /tmp/custom_node_requirements.txt
+
 # Own the conda env and the ComfyUI tree (container runs as user 1000:1000; matches
 # the live image layer)
 RUN chown -R 1000:1000 /opt/conda /opt/comfyui
