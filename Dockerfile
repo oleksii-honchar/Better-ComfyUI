@@ -72,6 +72,29 @@ COPY . /opt/comfyui
 # ComfyUI-Manager requirements (matches the live image layer; file is COPYed above)
 RUN /opt/conda/bin/pip install --no-cache-dir -r /opt/comfyui/manager_requirements.txt
 
+# Fix: Disable should_be_disabled() so custom_nodes/comfyui-manager loads its
+# web extension. The pip package's should_be_disabled() blocks any custom_nodes
+# directory whose name contains "comfyui-manager" to prevent the "legacy" Manager
+# from loading when the pip package is installed. But when using the pip package
+# + custom_nodes source together (as we do here), this prevents the web extension
+# from being registered. Line 77 of the installed package's __init__.py contains
+# the check; we disable it by making the function always return False.
+RUN /opt/conda/bin/python3 -c "
+import os
+import glob
+site_packages = glob.glob('/opt/conda/lib/python*/site-packages')[0]
+filepath = os.path.join(site_packages, 'comfyui_manager', '__init__.py')
+with open(filepath, 'r') as f:
+    lines = f.readlines()
+with open(filepath, 'w') as f:
+    for line in lines:
+        if line.strip().startswith(\"if 'comfyui-manager' in dir_name:\"):
+            f.write('        if False: # Disabled to allow custom_nodes web extension\n')
+        else:
+            f.write(line)
+print('Fixed should_be_disabled() in', filepath)
+"
+
 # Custom node requirements — installed at build time to avoid runtime pip installs.
 # This file is maintained separately (not git-managed) and regenerated when new
 # custom nodes are added. The entrypoint script still runs for nodes added after
