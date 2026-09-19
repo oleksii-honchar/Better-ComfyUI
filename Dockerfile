@@ -79,21 +79,8 @@ RUN /opt/conda/bin/pip install --no-cache-dir -r /opt/comfyui/manager_requiremen
 # + custom_nodes source together (as we do here), this prevents the web extension
 # from being registered. Line 77 of the installed package's __init__.py contains
 # the check; we disable it by making the function always return False.
-RUN /opt/conda/bin/python3 -c "
-import os
-import glob
-site_packages = glob.glob('/opt/conda/lib/python*/site-packages')[0]
-filepath = os.path.join(site_packages, 'comfyui_manager', '__init__.py')
-with open(filepath, 'r') as f:
-    lines = f.readlines()
-with open(filepath, 'w') as f:
-    for line in lines:
-        if line.strip().startswith(\"if 'comfyui-manager' in dir_name:\"):
-            f.write('        if False: # Disabled to allow custom_nodes web extension\n')
-        else:
-            f.write(line)
-print('Fixed should_be_disabled() in', filepath)
-"
+COPY scripts/fix-manager-should-be-disabled.py /tmp/fix-manager.py
+RUN /opt/conda/bin/python3 /tmp/fix-manager.py && rm /tmp/fix-manager.py
 
 # Custom node requirements — installed at build time to avoid runtime pip installs.
 # This file is maintained separately (not git-managed) and regenerated when new
