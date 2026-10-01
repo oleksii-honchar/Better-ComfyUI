@@ -37,7 +37,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgles2 \
         libglu1-mesa \
         libglx0 \
+        libgl1 \
+        xvfb \
     && rm -rf /var/lib/apt/lists/*
+
+# Create libGLU.so symlink (required by pyglet on some systems)
+RUN ln -sf /usr/lib/x86_64-linux-gnu/libGLU.so.1 /usr/lib/x86_64-linux-gnu/libGLU.so
 
 # Node.js 22 (LTS) — runtime dependency for ComfyUI-Manager (matches the live image).
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
