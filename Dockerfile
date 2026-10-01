@@ -23,7 +23,8 @@ FROM nvidia/cuda:12.8.1-devel-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYOPENGL_PLATFORM=egl
 
 # Base tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
