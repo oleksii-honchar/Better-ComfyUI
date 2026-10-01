@@ -69,3 +69,15 @@ loguru
 python-dateutil
 importlib_metadata
 filelock
+
+# krea2-anygles custom node dependencies
+braceexpand
+hydra-colorlog
+hydra-submitit-launcher
+jsonlines
+optree
+pyglet<2
+pyrender
+pytorch-lightning
+roma
+moge @ git+https://github.com/microsoft/MoGe.git@07444410f1e33f402353b99d6ccd26bd31e469e8
