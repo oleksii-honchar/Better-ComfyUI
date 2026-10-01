@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libx11-dev \
         libegl1 \
         libgles2 \
+        libglu1-mesa \
     && rm -rf /var/lib/apt/lists/*
 
 # Node.js 22 (LTS) — runtime dependency for ComfyUI-Manager (matches the live image).
