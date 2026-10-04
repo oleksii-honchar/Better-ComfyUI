@@ -5,9 +5,8 @@
 # Target:    RTX 5080 (Blackwell, sm_120) — requires CUDA 12.8+ / cu128 wheels
 #
 # Build:
-#   docker build \
-#     -t tuiteraz/better-comfyui:latest \
-#     -t tuiteraz/better-comfyui:250b2e95 .
+#   ./scripts/build-docker.sh                    # builds + pushes tuiteraz/better-comfyui:<short-sha-of-HEAD>
+#   ./scripts/build-docker.sh --promote-latest   # additionally pushes :latest (only after validation)
 #
 # Run (compose handles this in behemoth-lan):
 #   docker run --gpus all -p 8188:8188 \
