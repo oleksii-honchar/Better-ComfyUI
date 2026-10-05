@@ -11,10 +11,11 @@ if [ "$BRANCH" != "patched/master" ] && [[ "$BRANCH" != patched/master-* ]]; the
     exit 1
 fi
 
-PROMOTE_LATEST=false
 for arg in "$@"; do
     case "$arg" in
-        --promote-latest) PROMOTE_LATEST=true ;;
+        # --promote-latest is kept as a compatibility no-op: :latest is now
+        # pushed by the default run, so the flag must not push it a second time
+        --promote-latest) ;;
         *) echo "Error: unknown argument: $arg"
            exit 1 ;;
     esac
@@ -31,10 +32,10 @@ docker build \
 echo "Pushing to registry..."
 docker push "tuiteraz/better-comfyui:$TAG"
 
-# :latest is the deployment trigger — push it only via an explicit --promote-latest run
-if [ "$PROMOTE_LATEST" = true ]; then
-    echo "Promoting to :latest..."
-    docker push "tuiteraz/better-comfyui:latest"
-fi
+# :latest is the deployment trigger — the default run updates it alongside :$TAG
+# (user direction 2026-10-05: supersedes the ADR-5 gate that pushed :latest
+#  only via an explicit --promote-latest run; the flag remains accepted as a no-op)
+echo "Pushing :latest (deployment trigger)..."
+docker push "tuiteraz/better-comfyui:latest"
 
 echo "Done!"
