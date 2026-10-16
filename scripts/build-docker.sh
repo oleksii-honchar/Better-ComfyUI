@@ -35,6 +35,10 @@ docker push "tuiteraz/better-comfyui:$TAG"
 # :latest is the deployment trigger — the default run updates it alongside :$TAG
 # (user direction 2026-10-05: supersedes the ADR-5 gate that pushed :latest
 #  only via an explicit --promote-latest run; the flag remains accepted as a no-op)
+# Re-tag first: docker build only tags :$TAG, so without this step the push
+# below would re-publish whatever :latest pointed at locally (latent bug,
+# found 2026-10-16 during the v0.41.2 update).
+docker tag "tuiteraz/better-comfyui:$TAG" "tuiteraz/better-comfyui:latest"
 echo "Pushing :latest (deployment trigger)..."
 docker push "tuiteraz/better-comfyui:latest"
 
