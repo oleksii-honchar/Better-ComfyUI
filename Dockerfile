@@ -1,6 +1,6 @@
 # Better-ComfyUI Docker image
 #
-# Source:    this repository (Better-ComfyUI fork, v0.34.0)
+# Source:    this repository (Better-ComfyUI fork, patched/master-0-41-0 @ v0.41.2)
 # Pattern:   ComfyUI official docker image (nvidia/cuda base + torch cu128)
 # Target:    RTX 5080 (Blackwell, sm_120) — requires CUDA 12.8+ / cu128 wheels
 #
